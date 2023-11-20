@@ -6,7 +6,7 @@ from sqlalchemy import Column, String
 
 class User(BaseModel, Base):
     ''' The User class '''
-    __table__name = "users"
+    __tablename__ = 'users'
 
     email = Column(String(128), nullable=False)
     password = Column(String(128), nullable=False)
