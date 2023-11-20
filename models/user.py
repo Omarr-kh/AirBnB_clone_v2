@@ -4,7 +4,7 @@ from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
 
 
-class User(BaseModel):
+class User(BaseModel, Base):
     ''' The User class '''
     __table__name = "users"
 
