@@ -142,6 +142,39 @@ class TestMethods(unittest.TestCase):
         with self.assertRaises(TypeError):
             models.storage.reload(None)
 
+    def test_delete(self):
+        from models import storage
+
+        tafilalet = State(name="Tafilalet")
+        errachidia = City(name="Errachidia", state_id=tafilalet.id)
+        arfoud = City(name="Arfoud", state_id=tafilalet.id)
+
+        tafilalet.save()
+        errachidia.save()
+        arfoud.save()
+
+        dict_objs = storage.all()
+
+        self.assertIn(tafilalet, dict_objs.values())
+        self.assertIn(errachidia, dict_objs.values())
+        self.assertIn(arfoud, dict_objs.values())
+
+        storage.delete(errachidia)
+
+        dict_objs = storage.all()
+
+        self.assertIn(tafilalet, dict_objs.values())
+        self.assertNotIn(errachidia, dict_objs.values())
+        self.assertIn(arfoud, dict_objs.values())
+
+        storage.delete(tafilalet)
+
+        dict_objs = storage.all()
+
+        self.assertNotIn(tafilalet, dict_objs.values())
+        self.assertNotIn(errachidia, dict_objs.values())
+        self.assertIn(arfoud, dict_objs.values())
+
 
 @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') == 'db', 'Using DBStorage')
 class TestWithUser(unittest.TestCase):

@@ -13,6 +13,7 @@ class test_Place(test_basemodel):
                          description='Nice Yard', number_rooms=2,
                          number_bathrooms=1, max_guest=3, price_by_night=20.9,
                          longitude=88.4, latitude=137.3)
+
     def test_city_id(self):
         """ """
         self.assertEqual(type(self.new.city_id), str)
