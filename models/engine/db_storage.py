@@ -50,7 +50,7 @@ class DBStorage:
         engine = self.__engine
         session = self.__session
 
-        tables = [State, City, User]
+        tables = [State, City, User, Place]
 
         if cls:
             tables = [cls]
