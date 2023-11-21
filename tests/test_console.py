@@ -235,6 +235,9 @@ class TestShowCommand(unittest.TestCase):
         if os.getenv('HBNB_TYPE_STORAGE') != 'db':
             self.storage._FileStorage__objects = {}
 
+        self.arizona = State(name='Arizona')
+        self.arizona.save()
+
     def tearDown(self):
         '''Runs after each test'''
 
@@ -272,14 +275,10 @@ class TestShowCommand(unittest.TestCase):
         '''Test showing an instance, ex : State'''
 
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd('create State name="Texas"')
-            texas_id = f.getvalue().strip()
-            HBNBCommand().onecmd(f'show State {texas_id}')
+            HBNBCommand().onecmd(f'show State {self.arizona.id}')
             output = f.getvalue().strip()
 
-            texas = self.storage.all()[f'State.{texas_id}']
-
-            self.assertEqual(output, str(texas))
+            self.assertEqual(output, str(self.arizona))
 
 
 class TestDestroyCommand(unittest.TestCase):
