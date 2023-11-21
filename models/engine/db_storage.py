@@ -50,7 +50,7 @@ class DBStorage:
         engine = self.__engine
         session = self.__session
 
-        tables = [State, City, User, Place, Review, Amenity]
+        tables = [State, City, User, Place, Review]
 
         if cls:
             tables = [cls]
@@ -68,7 +68,7 @@ class DBStorage:
         Create all the tables in the database,
         then create the current database session
         '''
-        from models.base_model import Base, BaseModel
+        from models.base_model import Base
         from models.user import User
         from models.place import Place
         from models.state import State

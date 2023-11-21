@@ -10,11 +10,11 @@ Test Classes:
 """
 
 import unittest
+import os
 import sys
 from io import StringIO
 from unittest.mock import patch
 from console import HBNBCommand
-from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -79,15 +79,38 @@ class TestCreateCommand(unittest.TestCase):
 
     def setUp(self):
         '''Runs before every test'''
+        from models import storage
 
-        self.storage = FileStorage()
-        self.storage.reload()
-        self.storage._FileStorage__objects = {}
+        self.storage = storage
+        if os.getenv('HBNB_TYPE_STORAGE') != 'db':
+            self.storage._FileStorage__objects = {}
+
+        self.arizona = State(name='Arizona')
+        self.arizona.save()
+
+        self.san_jose = City(name='San Jose', state_id=self.arizona.id)
+        self.san_jose.save()
+
+        self.john_doe = User(email='john_doe@baz.com', password='mlmlml',
+                             first_name='John', last_name='Doe')
+        self.john_doe.save()
+
+        self.huge_house = Place(name='Huge House', description='Sweet home',
+                                city_id=self.san_jose.id, user_id=self.john_doe.id)
+        self.huge_house.save()
+
+        self.john_review = Review(text='Excellent', user_id=self.john_doe.id,
+                                  place_id=self.huge_house.id)
+        self.john_review.save()
+
+        self.heating = Amenity(name='Heating')
+        self.heating.save()
 
     def tearDown(self):
         '''Runs after each test'''
 
-        self.storage._Filestorage__objects = {}
+        if os.getenv('HBNB_TYPE_STORAGE') != 'db':
+            self.storage._Filestorage__objects = {}
 
     def test_errors(self):
         '''Test Errors mangement of `create` command'''
@@ -104,6 +127,7 @@ class TestCreateCommand(unittest.TestCase):
 
             self.assertEqual(output, '** class doesn\'t exist **')
 
+    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') == 'db', 'Using DBStorage')
     def test_create_BaseModel(self):
         '''Test creating a BaseModel instance'''
 
@@ -115,21 +139,11 @@ class TestCreateCommand(unittest.TestCase):
             self.assertIn(f'BaseModel.{output_id}', objs_dict.keys())
 
     def test_create_User(self):
-        '''Test creating a User instance'''
+        '''Test creating a User instance with '''
 
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd('create User')
-            output_id = f.getvalue().strip()
-            objs_dict = self.storage.all()
-
-            self.assertIn(f'User.{output_id}', objs_dict.keys())
-
-    def test_create_User_with_parameters(self):
-        '''Test creating a User instance with paramters'''
-
-        with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd('create User name="Omar_Youssef" ' +
-                                 'age=22 height=1.69 mess=mess invalid=7.7.5')
+            HBNBCommand().onecmd('create User email="OmarYoussef@ex.com" ' +
+                                 'password="mlml" age=22 height=1.7 nil=mess')
             output_id = f.getvalue().strip()
             objs_dict = self.storage.all()
             key = f'User.{output_id}'
@@ -138,35 +152,46 @@ class TestCreateCommand(unittest.TestCase):
 
             user = objs_dict[key]
 
-            self.assertEqual(user.name, 'Omar Youssef')
+            self.assertEqual(user.email, 'OmarYoussef@ex.com')
+            self.assertEqual(user.password, 'mlml')
             self.assertEqual(user.age, 22)
-            self.assertEqual(user.height, 1.69)
+            self.assertEqual(user.height, 1.7)
 
     def test_create_State(self):
         '''Test creating a State instance'''
 
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd('create State')
+            HBNBCommand().onecmd('create State name="Arizona"')
             output_id = f.getvalue().strip()
             objs_dict = self.storage.all()
 
-            self.assertIn(f'State.{output_id}', objs_dict.keys())
+            key = f'State.{output_id}'
+
+            self.assertIn(key, objs_dict.keys())
+            self.assertEqual(objs_dict[key].name, 'Arizona')
 
     def test_create_City(self):
         '''Test creating a City instance'''
 
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd('create City')
+            HBNBCommand().onecmd('create City name="New_York" ' +
+                                 f'state_id="{self.arizona.id}"')
             output_id = f.getvalue().strip()
             objs_dict = self.storage.all()
 
-            self.assertIn(f'City.{output_id}', objs_dict.keys())
+            key = f'City.{output_id}'
+
+            self.assertIn(key, objs_dict.keys())
+            self.assertEqual(objs_dict[key].name, 'New York')
+            self.assertEqual(objs_dict[key].state_id, self.arizona.id)
 
     def test_create_Place(self):
         '''Test creating a Place instance'''
 
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd('create Place')
+            cmd = 'create Place name="Home" description="Sweet" '
+            cmd += f'user_id="{self.john_doe.id}" city_id="{self.san_jose.id}"'
+            HBNBCommand().onecmd(cmd)
             output_id = f.getvalue().strip()
             objs_dict = self.storage.all()
 
@@ -176,7 +201,7 @@ class TestCreateCommand(unittest.TestCase):
         '''Test creating a Amenity instance'''
 
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd('create Amenity')
+            HBNBCommand().onecmd('create Amenity name="Wi-Fi"')
             output_id = f.getvalue().strip()
             objs_dict = self.storage.all()
 
@@ -186,7 +211,9 @@ class TestCreateCommand(unittest.TestCase):
         '''Test creating a Review instance'''
 
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd('create Review')
+            HBNBCommand().onecmd('create Review text="Good"' +
+                                 f'user_id="{self.john_doe.id}" ' +
+                                 f'city_id="{self.san_jose.id}"')
             output_id = f.getvalue().strip()
             objs_dict = self.storage.all()
 
@@ -200,15 +227,17 @@ class TestShowCommand(unittest.TestCase):
 
     def setUp(self):
         '''Runs before every test'''
+        from models import storage
 
-        self.storage = FileStorage()
-        self.storage.reload()
-        self.storage._FileStorage__objects = {}
+        self.storage = storage
+        if os.getenv('HBNB_TYPE_STORAGE') != 'db':
+            self.storage._FileStorage__objects = {}
 
     def tearDown(self):
         '''Runs after each test'''
 
-        self.storage._Filestorage__objects = {}
+        if os.getenv('HBNB_TYPE_STORAGE') != 'db':
+            self.storage._Filestorage__objects = {}
 
     def test_errors(self):
         '''Test Errors mangement of `show` command'''
@@ -238,16 +267,16 @@ class TestShowCommand(unittest.TestCase):
             self.assertEqual(output, '** no instance found **')
 
     def test_show_an_instance(self):
-        '''Test showing an instance, ex : BaseModel'''
+        '''Test showing an instance, ex : State'''
 
-        base_m = BaseModel()
-        base_m.save()
+        arizona = State(name='Arizona')
+        arizona.save()
 
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd(f'show BaseModel {base_m.id}')
+            HBNBCommand().onecmd(f'show State {arizona.id}')
             output = f.getvalue().strip()
 
-            self.assertEqual(output, str(base_m))
+            self.assertEqual(output, str(arizona))
 
 
 class TestDestroyCommand(unittest.TestCase):
@@ -257,15 +286,17 @@ class TestDestroyCommand(unittest.TestCase):
 
     def setUp(self):
         '''Runs before every test'''
+        from models import storage
 
-        self.storage = FileStorage()
-        self.storage.reload()
-        self.storage._FileStorage__objects = {}
+        self.storage = storage
+        if os.getenv('HBNB_TYPE_STORAGE') != 'db':
+            self.storage._FileStorage__objects = {}
 
     def tearDown(self):
         '''Runs after each test'''
 
-        self.storage._Filestorage__objects = {}
+        if os.getenv('HBNB_TYPE_STORAGE') != 'db':
+            self.storage._Filestorage__objects = {}
 
     def test_errors(self):
         '''Test Errors mangement of `destroy` command'''
@@ -297,7 +328,7 @@ class TestDestroyCommand(unittest.TestCase):
     def test_destroy_an_instance(self):
         '''Test destroying an instance, ex : User'''
 
-        user_m = User()
+        user_m = User(email="example@gmail.com", password="mlmlml")
         user_m.save()
         objs_dict = self.storage.all()
 
