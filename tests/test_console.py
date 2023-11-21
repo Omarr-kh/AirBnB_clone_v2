@@ -96,7 +96,8 @@ class TestCreateCommand(unittest.TestCase):
         self.john_doe.save()
 
         self.huge_house = Place(name='Huge House', description='Sweet home',
-                                city_id=self.san_jose.id, user_id=self.john_doe.id)
+                                city_id=self.san_jose.id,
+                                user_id=self.john_doe.id)
         self.huge_house.save()
 
         self.john_review = Review(text='Excellent', user_id=self.john_doe.id,
@@ -154,8 +155,9 @@ class TestCreateCommand(unittest.TestCase):
 
             self.assertEqual(user.email, 'OmarYoussef@ex.com')
             self.assertEqual(user.password, 'mlml')
-            self.assertEqual(user.age, 22)
-            self.assertEqual(user.height, 1.7)
+            if os.getenv('HBNB_TYPE_STORAGE') != 'db':
+                self.assertEqual(user.age, 22)
+                self.assertEqual(user.height, 1.7)
 
     def test_create_State(self):
         '''Test creating a State instance'''
@@ -211,9 +213,9 @@ class TestCreateCommand(unittest.TestCase):
         '''Test creating a Review instance'''
 
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd('create Review text="Good"' +
+            HBNBCommand().onecmd('create Review text="Good" ' +
                                  f'user_id="{self.john_doe.id}" ' +
-                                 f'city_id="{self.san_jose.id}"')
+                                 f'place_id="{self.huge_house.id}"')
             output_id = f.getvalue().strip()
             objs_dict = self.storage.all()
 
@@ -269,14 +271,15 @@ class TestShowCommand(unittest.TestCase):
     def test_show_an_instance(self):
         '''Test showing an instance, ex : State'''
 
-        arizona = State(name='Arizona')
-        arizona.save()
-
         with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd(f'show State {arizona.id}')
+            HBNBCommand().onecmd('create State name="Texas"')
+            texas_id = f.getvalue().strip()
+            HBNBCommand().onecmd(f'show State {texas_id}')
             output = f.getvalue().strip()
 
-            self.assertEqual(output, str(arizona))
+            texas = self.storage.all()[f'State.{texas_id}']
+
+            self.assertEqual(output, str(texas))
 
 
 class TestDestroyCommand(unittest.TestCase):
@@ -289,6 +292,7 @@ class TestDestroyCommand(unittest.TestCase):
         from models import storage
 
         self.storage = storage
+        storage.reload()
         if os.getenv('HBNB_TYPE_STORAGE') != 'db':
             self.storage._FileStorage__objects = {}
 

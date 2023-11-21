@@ -33,6 +33,13 @@ class DBStorage:
         '''Commit all the changes of the current database session'''
         self.__session.commit()
 
+    def delete(self, obj=None):
+        '''Delete a record from the current database session'''
+
+        if obj:
+            self.__session.delete(obj)
+            self.save()
+
     def all(self, cls=None):
         '''
         Query on the current database session all objects,
@@ -50,7 +57,7 @@ class DBStorage:
         engine = self.__engine
         session = self.__session
 
-        tables = [State, City, User, Place, Review]
+        tables = [State, City, User, Place, Review, Amenity]
 
         if cls:
             tables = [cls]

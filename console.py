@@ -5,7 +5,7 @@ import cmd
 import os
 import sys
 from models.base_model import BaseModel
-from models.__init__ import storage
+from models import storage
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -225,8 +225,8 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del (storage.all()[key])
-            storage.save()
+            obj_to_delete = storage.all()[key]
+            storage.delete(obj_to_delete)
         except KeyError:
             print("** no instance found **")
 
