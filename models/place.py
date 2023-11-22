@@ -30,11 +30,11 @@ class Place(BaseModel, Base):
     longitude = Column(Float, nullable=True)
     amenity_ids = []
     amenities = relationship("Amenity", secondary="place_amenity",
-                             viewonly=False, back_populates="place_amenities")
+                             viewonly=False, backref="place_amenities")
     reviews = relationship("Review", backref="place", cascade="all, delete")
 
     @property
-    def reviews():
+    def reviews(self):
         '''Retrieve all reviews associated with this place'''
         all_reviews = storage.all(Review)
         place_reviews = []
@@ -44,3 +44,14 @@ class Place(BaseModel, Base):
                 place_reviews.append(rev)
 
         return place_reviews
+
+    @property
+    def amenities(self):
+        """getter attribute returns the list of Amenity instances"""
+            from models.amenity import Amenity
+            amenity_list = []
+            all_amenities = models.storage.all(Amenity)
+            for amenity in all_amenities.values():
+                if amenity.place_id == self.id:
+                    amenity_list.append(amenity)
+            return amenity_list
