@@ -11,3 +11,5 @@ class Amenity(BaseModel, Base):
     __tablename__ = 'ameneties'
 
     name = Column(String(128), nullable=False)
+    place_ameneties = relationship('Place', secondary='place_amenety',
+                                   viewonly=False, back_populates='ameneties')
