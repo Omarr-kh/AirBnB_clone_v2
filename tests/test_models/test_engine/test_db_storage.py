@@ -8,7 +8,6 @@ Unittest classes:
 
 from datetime import datetime
 import inspect
-import models
 from models.engine.db_storage import DBStorage
 from models.amenity import Amenity
 from models.base_model import BaseModel
