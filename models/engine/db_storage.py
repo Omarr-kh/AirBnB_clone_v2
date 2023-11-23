@@ -3,6 +3,7 @@
 from os import getenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
+from models.base_model import Base
 
 
 class DBStorage:
@@ -21,7 +22,6 @@ class DBStorage:
         self.__engine = create_engine(db_link, pool_pre_ping=True)
 
         if getenv('HBNB_ENV') == 'test':
-            from models.base_model import Base
             Base.metadata.drop_all(bind=self.__engine)
 
     def new(self, obj=None):
