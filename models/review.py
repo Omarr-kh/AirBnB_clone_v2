@@ -11,8 +11,12 @@ class Review(BaseModel, Base):
 
     if getenv('HBNB_TYPE_STORAGE') == 'db':
         text = Column(Text(1024), nullable=False)
-        place_id = Column(String(60), ForeignKey('places.id'), nullable=False)
-        user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
+        place_id = Column(String(60),
+                          ForeignKey('places.id', ondelete='CASCADE'),
+                          nullable=False)
+        user_id = Column(String(60),
+                         ForeignKey('users.id', ondelete='CASCADE'),
+                         nullable=False)
     else:
         text = ''
         place_id = ''
