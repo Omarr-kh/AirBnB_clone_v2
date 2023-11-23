@@ -361,13 +361,12 @@ class TestWithPlace(unittest.TestCase):
         amenity_3 = Amenity(name="Oven")
         amenity_3.save()
 
-#        obj.amenities.append(amenity_1)
-#        obj.amenities.append(amenity_2)
-#        obj.amenities.append(amenity_3)
+        obj.amenities.append(amenity_1)
+        obj.amenities.append(amenity_2)
+        obj.amenities.append(amenity_3)
 
         self.storage.new(obj)
         self.storage.save()
-        self.storage.reload()
         storage_objs = self.storage.all()
 
         self.assertIn(key, storage_objs)
@@ -387,9 +386,9 @@ class TestWithPlace(unittest.TestCase):
         self.assertEqual(type(storage_objs[key].longitude), float)
         self.assertEqual(storage_objs[key].longitude, 45.23)
 
-#        self.assertIn(amenity_1, storage_objs[key].amenities)
-#        self.assertIn(amenity_2, storage_objs[key].amenities)
-#        self.assertIn(amenity_3, storage_objs[key].amenities)
+        self.assertIn(amenity_1, storage_objs[key].amenities)
+        self.assertIn(amenity_2, storage_objs[key].amenities)
+        self.assertIn(amenity_3, storage_objs[key].amenities)
 
 
 @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db', 'Using FileStorage')
