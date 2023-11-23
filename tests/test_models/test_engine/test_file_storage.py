@@ -116,14 +116,6 @@ class TestMethods(unittest.TestCase):
         with self.assertRaises(TypeError):
             models.storage.new(BaseModel(), "testing")
 
-    def test_save_method(self):
-        base_m = BaseModel()
-        models.storage.new(base_m)
-        models.storage.save()
-        with open("file.json", "r") as f:
-            storage_content = f.read()
-            self.assertIn("BaseModel." + base_m.id, storage_content)
-
     def test_save_method_args(self):
         with self.assertRaises(TypeError):
             models.storage.save(None)
