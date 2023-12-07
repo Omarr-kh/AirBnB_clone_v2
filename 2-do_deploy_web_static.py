@@ -3,7 +3,7 @@
     Deploy web_static on Servers
 '''
 from fabric.api import run, put, env, local
-import os
+from os.path import exists
 from datetime import datetime
 
 env.hosts = ["54.235.193.23", "	54.209.125.126"]
