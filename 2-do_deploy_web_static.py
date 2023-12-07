@@ -25,12 +25,12 @@ def do_pack():
 
 def do_deploy(archive_path):
     ''' deploy archive to servers '''
-    if not os.path.isfile(archive_path):
-        return False
-    file_path = archive_path.split("/")[-1]
-    file_name = file_path.split(".")[0]
-    des_path = "/data/web_static/releases/"
     try:
+        if not os.path.isfile(archive_path):
+            return False
+        file_path = archive_path.split("/")[-1]
+        file_name = file_path.split(".")[0]
+        des_path = "/data/web_static/releases/"
         put(archive_path, f"/tmp/{file_path}")
         run(f"mkdir -p {des_path}/{file_name}")
         run(f"tar -xzf /tmp/{file_path} -C {des_path}/{file_name}/")
