@@ -12,7 +12,7 @@ def do_pack():
     current_date = datetime.now().strftime('%Y%m%d%H%M%S')
     archive_name = "web_static_" + current_date + ".tgz"
 
-    local("mkdir versions")
+    local("mkdir -p versions")
     folder_path = f"versions/{archive_name}"
     try:
         local(f"tar -cvzf {folder_path} web_static")
