@@ -11,5 +11,11 @@ def home():
     return "Hello HBNB!"
 
 
+@app.route("/hbnb", strict_slashes=False)
+def hbnb():
+    ''' returns "HBNB!" for the route "/" '''
+    return "HBNB!"
+
+
 if __name__ == "__main__":
     app.run()
