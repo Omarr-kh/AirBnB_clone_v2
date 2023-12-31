@@ -1,14 +1,15 @@
 #!/usr/bin/python3
-'''A minimal flask app'''
-from flask import Flask
+''' start a flask web app '''
+import flask
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 
 
 @app.route("/", strict_slashes=False)
 def home():
-    return 'Hello HBNB!'
+    ''' returns "Hello HBNB!" for the route "/" '''
+    return "Hello HBNB!"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()
