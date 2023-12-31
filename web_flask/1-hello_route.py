@@ -7,8 +7,10 @@ app = flask.Flask(__name__)
 
 @app.route("/", strict_slashes=False)
 def hello():
-    ''' returns "Hello HBNB!" for the route "/" '''
     return "Hello HBNB!"
+
+
+def hello
 
 
 if __name__ == "__main__":
